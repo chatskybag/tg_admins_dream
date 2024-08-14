@@ -24,8 +24,8 @@ def create_client():
     # Читаем файл config.ini
     config.read(path_to_config(cfg_name))
     # Получаем конфигурационные значения
-    api_id = config.getint('KALLY','api_id')
-    api_hash = config['KALLY']['api_hash']
+    api_id = config.getint('MAIN_SESSION','api_id')
+    api_hash = config['MAIN_SESSION']['api_hash']
 
     client = TelegramClient('gpt_adds', api_id, api_hash, system_version="Telegram Android 10.15.1", device_model="Poco X3", app_version='0.3 beta')
     return client
