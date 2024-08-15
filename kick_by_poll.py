@@ -6,10 +6,11 @@ from telethon import functions
 
 # создаем сессию
 client = create_client()
+
 global user_ids, poll_ids, chat_id
 
 # Список id тех, кого ну никак нельзя кикать из группы
-white_list = [1230480769, 1584816588, 428033786, 314211715, 137319637, 1158439141, 276585077, 6424014829, 7261927301]
+white_list = [1230480769, 1584816588, 428033786, 314211715, 137319637, 1158439141, 276585077, 70401481]
 
 # None - отчётность в консоль, Любое значение - отчетность в чат
 to = None
@@ -26,14 +27,21 @@ async def print_to(msg, to_):
 
 
 @client.on(events.NewMessage(pattern='/start'))
-@client.on(events.NewMessage(pattern='/help'))
 async def start_handler(event):
+    await client.get_dialogs(limit=40)
+    print("Бот запущен")
+
+
+@client.on(events.NewMessage(pattern='/help'))
+async def help_handler(event):
+    global chat_id
+    chat_id = get_chat_id(event)[1]
     await print_to("""
-    Привет! Я запустился, я подключился. Порядок такой:
-    1. /users
-    1. *опционально* /show_users
-    2. Пересылаешь опрос, введя текст /reply_poll (кнопка "ответить") 
-    3. /kick_by_poll
+    Привет от бота! Порядок такой:
+    1. /users - получить пользователей чата
+    2. /show_users - вывести список пользователей чата
+    3. Пересылаешь опрос, введя текст /reply_poll (кнопка "ответить") 
+    4. /kick_by_poll - для запуска процедуры кика 
     """, to)
 
 
@@ -57,24 +65,23 @@ async def take_users(event):
 @client.on(events.NewMessage(pattern='/show_users'))
 async def show_users(event):
     global user_ids
-    await print_to(f"Список пользователей чата: \n{user_ids}", to)
+    await print_to(f"Количество пользователей чата {len(user_ids)}, список: \n{user_ids}", to)
 
 
 @client.on(events.NewMessage(pattern='/reply_poll'))
 async def poll_handler(event):
     global chat_id
-    # Проверяем, является ли сообщение опросом
-    # if hasattr(event.message, 'poll'):
 
-    # Получение предыдущего сообщения
+    # Получение reply сообщения
     reply_poll = await event.get_reply_message()
 
+    # Проверка, что получили опрос
     if reply_poll.poll is not None:
         global poll_ids
         all_users = []
         offset = ''
 
-        # Цикл с перебором offset, пока не получены все голоса
+        # Цикл с перебором offset, пока не получены все пользователи
         while offset is not None:
             results = await client(functions.messages.GetPollVotesRequest(
                 peer=reply_poll.peer_id,
@@ -94,8 +101,8 @@ async def poll_handler(event):
         try:
             await print_to(f"Количество голосовавших {len(all_users)}, участники: \n{all_users}", to)
         except NameError:
-            print('Результаты опроса получены, но для детализации списка сначала получи chat_id, используя команду '
-                  '/users')
+            print('Результаты опроса получены, но для детализации списка пользователей сначала получи chat_id, используя'
+                  ' команду /users')
         poll_ids = all_users
     else:
         try:
@@ -112,7 +119,6 @@ async def show_users(event):
 
     for idx, user in enumerate(user_ids):
         try:
-            # await client.send_message(chat_id, f"Проверяем, есть ли {user} в списке голосовавших")
             await print_to(f"- Проверяем, есть ли {user} в списке голосовавших", to)
             if user not in poll_ids:
                 if user in white_list:
