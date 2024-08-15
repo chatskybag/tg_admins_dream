@@ -1,5 +1,5 @@
 '''
-Функции для создания сессии (client)
+Функции для создания сессии (client) и их помощники
 '''
 import configparser
 from telethon import TelegramClient, events, functions
@@ -27,5 +27,5 @@ def create_client():
     api_id = config.getint('MAIN_SESSION','api_id')
     api_hash = config['MAIN_SESSION']['api_hash']
 
-    client = TelegramClient('gpt_adds', api_id, api_hash, system_version="Telegram Android 10.15.1", device_model="Poco X3", app_version='0.3 beta')
+    client = TelegramClient('main_session', api_id, api_hash, system_version="Telegram Android 10.15.1", device_model="Poco X3", app_version='0.3 beta')
     return client
