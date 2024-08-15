@@ -22,3 +22,17 @@ def get_chat_id(event):
         chat_id = None
     return peer_id, chat_id
 
+
+async def printing_status(client, text, chat_id=None, mode=None):
+    '''
+    Вывод отчетности в консоль или в сообщения телеграма
+    :param client: созданная сессия client
+    :param chat_id: id чата, в который будет отправляться отчетность
+    :param text: текст отчётности
+    :param mode: куда будет направляться отчётность, если заполнено любым значением, то в телеграм
+    :return:
+    '''
+    if mode is None:
+        return print(text)
+    else:
+        return await client.send_message(chat_id, text)
