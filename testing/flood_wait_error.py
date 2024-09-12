@@ -16,20 +16,18 @@ white_list = [1230480769, 1584816588, 428033786, 314211715, 137319637, 115843914
 
 
 @client.on(events.NewMessage(outgoing=True, pattern='!flood'))
-async def handler(event):
-    a = 0
-    request = "Some request"  # Замените на ваш запрос
-    seconds = 10  # Замените на время ожидания
+async def flood_handler(event):
+    request = "Some request"  # Заглушечный запрос
+    seconds = 10  # Заглушечное время ожидания
     for idx, user in enumerate(white_list):
         try:
-            # await event.respond('!pong')
             if idx == 5:
                 raise errors.FloodWaitError(request, seconds)
             print("Число это: ", idx, user)
         except errors.FloodWaitError as e:
             print('Have to sleep', e.seconds, 'seconds')
             time.sleep(e.seconds)
-            # просто добавить сюда действия как в блоке try
+            # просто добавить сюда действия как в блоке try, чтобы пользователь, на котором ошибка, не выпадал
             print("Число это: ", idx, user)
             continue
 
