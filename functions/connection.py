@@ -26,6 +26,12 @@ def create_client():
     # Получаем конфигурационные значения
     api_id = config.getint('MAIN_SESSION','api_id')
     api_hash = config['MAIN_SESSION']['api_hash']
-
+    try:
+        password = config['MAIN_SESSION']['password']
+        if len(password)<1:
+            password = None
+    except KeyError:
+        password = None
     client = TelegramClient('main_session', api_id, api_hash, system_version="Telegram Android 10.15.1", device_model="Poco X3", app_version='0.3 beta')
+    client.start(password=password)
     return client
